@@ -1,7 +1,7 @@
 <?php 
 include '../lib/common.php';
 
-$user1 = preg_replace("/[^0-9]/","",$_REQUEST['user']);
+$user1 = preg_replace("/[^0-9a-zA-Z@\.\!#\$%\&\*+_\~\?\-]/","",$_REQUEST['user']);
 $pass1 = preg_replace($CFG->pass_regex,"",$_REQUEST['pass']);
 $email_authcode = $_REQUEST['email_authcode'];
 $email_authcode_request = !empty($_REQUEST['email_authcode_request']);
@@ -37,7 +37,7 @@ if ((!$user1 || !$pass1) && !$user_id)
 $result = db_query_array("SELECT site_users.*, site_users_access.start AS `start`, site_users_access.last AS `last`, site_users_access.attempts AS attempts FROM site_users LEFT JOIN site_users_access ON (site_users_access.site_user = site_users.id) WHERE ".(($user_id > 0) ? "site_users.id = $user_id" :  "site_users.user = '$user1'"));
 
 if (!$result) {
-	if (strlen($user1) == 8) {
+	if (strlen($user1) > 5) {
 		if ($ip_int) {
 			$timeframe = (!empty($CFG->cloudflare_blacklist_timeframe)) ? $CFG->cloudflare_blacklist_timeframe : 15;
 			$sql = 'SELECT COUNT(1) AS login_attempts FROM ip_access_log WHERE login = "Y" AND `timestamp` > DATE_SUB("'.date('Y-m-d H:i:s').'", INTERVAL '.$timeframe.' MINUTE) AND ip = '.$ip_int;
